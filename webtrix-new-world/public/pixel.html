@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pixel Blob Arena</title>
+<style>
+  body {
+    background: #111;
+    margin: 0;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    background: #000;
+  }
+</style>
+</head>
+<body>
+<canvas id="arena"></canvas>
+<script>
+const canvas = document.getElementById("arena");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+class Blob {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.radius = Math.random() * 20 + 10;
+    this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+    this.speedX = (Math.random() - 0.5) * 4;
+    this.speedY = (Math.random() - 0.5) * 4;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  }
+  update(blobs) {
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) this.speedX *= -1;
+    if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) this.speedY *= -1;
+
+    // Collision eating
+    for (let i = blobs.length - 1; i >= 0; i--) {
+      let other = blobs[i];
+      if (other !== this) {
+        let dx = this.x - other.x;
+        let dy = this.y - other.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < this.radius + other.radius) {
+          if (this.radius > other.radius) {
+            this.radius += other.radius * 0.3;
+            blobs.splice(i, 1);
+          }
+        }
+      }
+    }
+    this.draw();
+  }
+}
+
+let blobs = [];
+for (let i = 0; i < 20; i++) blobs.push(new Blob());
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  blobs.forEach(blob => blob.update(blobs));
+
+  if (blobs.length > 1) {
+    requestAnimationFrame(animate);
+  } else {
+    ctx.fillStyle = "#fff";
+    ctx.font = "40px monospace";
+    ctx.fillText("Winner!", canvas.width / 2 - 80, canvas.height / 2);
+  }
+}
+
+animate();
+</script>
+</body>
+</html>

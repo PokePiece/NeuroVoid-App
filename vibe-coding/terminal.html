@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hacker Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: #0f0;
+      font-family: monospace;
+      padding: 10px;
+      overflow: hidden;
+    }
+    #terminal {
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    .input-line::before {
+      content: "> ";
+      color: #0f0;
+    }
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script>
+    const terminal = document.getElementById("terminal");
+    const logs = [
+      "Initializing system protocols...",
+      "Bypassing firewall...",
+      "Accessing secure database...",
+      "Downloading classified data...",
+      "Encrypting transmission...",
+      "Connection secure.",
+      "Injecting payload...",
+      "Payload complete. System compromised.",
+      "Retrieving bonus content...",
+      "Self-destruct sequence initiated."
+    ];
+
+    let inputLine = "";
+    let typing = false;
+
+    function typeLine(text, delay = 50) {
+      return new Promise(resolve => {
+        let i = 0;
+        typing = true;
+        const interval = setInterval(() => {
+          terminal.innerHTML += text[i];
+          i++;
+          if (i >= text.length) {
+            clearInterval(interval);
+            terminal.innerHTML += "\n";
+            typing = false;
+            resolve();
+          }
+        }, delay);
+      });
+    }
+
+    async function runLogs() {
+      for (let log of logs) {
+        await typeLine(log, 20 + Math.random() * 30);
+        await new Promise(r => setTimeout(r, 300 + Math.random() * 500));
+      }
+      await typeLine(">>> MISSION COMPLETE <<<", 40);
+    }
+
+    function showPrompt() {
+      terminal.innerHTML += "\n> ";
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (typing) return;
+      if (e.key.length === 1) {
+        inputLine += e.key;
+        terminal.innerHTML += e.key;
+      } else if (e.key === "Backspace") {
+        inputLine = inputLine.slice(0, -1);
+        terminal.innerHTML = terminal.innerHTML.slice(0, -1);
+      } else if (e.key === "Enter") {
+        terminal.innerHTML += "\n";
+        handleCommand(inputLine.trim());
+        inputLine = "";
+      }
+    });
+
+    function handleCommand(cmd) {
+      if (cmd.toLowerCase() === "hack") {
+        runLogs().then(showPrompt);
+      } else if (cmd.toLowerCase() === "help") {
+        terminal.innerHTML += "Commands: hack, help, clear\n";
+        showPrompt();
+      } else if (cmd.toLowerCase() === "clear") {
+        terminal.innerHTML = "";
+        showPrompt();
+      } else {
+        terminal.innerHTML += `Unknown command: ${cmd}\n`;
+        showPrompt();
+      }
+    }
+
+    showPrompt();
+  </script>
+</body>
+</html>

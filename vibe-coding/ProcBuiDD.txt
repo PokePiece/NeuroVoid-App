@@ -1,0 +1,199 @@
+Alright — here’s a comprehensive design document for the system you described, so any dev team (or future you) can pick it up and know exactly how to implement it.
+
+Living Internet Structures – Design Document
+1. Overview
+The goal is to algorithmically generate context-aware 3D building representations of websites, where each structure visually reflects the site's nature, popularity, and category. The system will:
+
+Pull real-world site data (popularity, category, description).
+
+Use an AI-driven mapping layer to translate that data into structured visual parameters.
+
+Render buildings in Three.js / React Three Fiber (R3F) from a library of modular building components.
+
+Scale to thousands of sites dynamically without manual art direction.
+
+2. System Architecture
+Pipeline Overview
+
+javascript
+Copy
+Edit
+Data Fetcher  →  Site Data Normalizer  →  AI Style Generator  →  Building Store  →  R3F Renderer
+2.1 Data Fetcher
+Sources:
+
+Tranco API (site popularity ranks)
+
+Wikidata API (site categories, descriptions, founding dates)
+
+Custom web scraper (fallback if data missing)
+
+Data Points:
+
+name
+
+url
+
+rank (integer)
+
+category (e.g., "Video Sharing", "News", "E-Commerce")
+
+description (text)
+
+color hints (if available from branding analysis)
+
+2.2 Site Data Normalizer
+Normalizes raw API output into:
+
+json
+Copy
+Edit
+{
+  "name": "YouTube",
+  "url": "https://youtube.com",
+  "rank": 2,
+  "category": "Video Sharing",
+  "description": "A popular platform for sharing and watching videos.",
+  "brandingColors": ["#ff0000", "#ffffff"]
+}
+Uses a category map to standardize categories into a finite set:
+
+video
+
+news
+
+ecommerce
+
+social
+
+reference
+
+entertainment
+
+tech
+
+other
+
+3. AI Style Generator
+3.1 Prompting
+We pass the normalized site data to an AI model (Google Gemini or local LLaMA 70M–410M), along with:
+
+A list of available building components (roofs, walls, extras).
+
+Example mappings from categories to style choices.
+
+Output format specification (strict JSON).
+
+3.2 Example Prompt
+css
+Copy
+Edit
+You are a style mapper for an Internet visualization. 
+Given the following site data:
+{
+  "name": "YouTube",
+  "rank": 2,
+  "category": "video",
+  "description": "A popular platform for sharing and watching videos.",
+  "brandingColors": ["#ff0000", "#ffffff"]
+}
+Choose a building configuration using only the provided components.
+
+Components:
+Roofs: flat-industrial, gabled-classic, glass-dome, pagoda-tiered, billboard-roof
+Walls: glass-panels, red-brick, concrete-brutalist, wooden-facade, neon-frames
+Extras: rotating-billboard, news-podium, interactive-fountain, drone-swarm, market-stalls, satellite-dish, data-stream-beam
+
+Return JSON in the format:
+{
+  "scale": "small|medium|large",
+  "roof": { "style": "string", "color": "#hex" },
+  "walls": { "style": "string", "color": "#hex" },
+  "extras": ["string", "string"]
+}
+3.3 Example AI Output
+json
+Copy
+Edit
+{
+  "scale": "large",
+  "roof": { "style": "billboard-roof", "color": "#ff0000" },
+  "walls": { "style": "glass-panels", "color": "#ffffff" },
+  "extras": ["rotating-billboard", "data-stream-beam"]
+}
+4. Building Store (Component Library)
+We prebuild all visual parts in R3F (or import GLTFs), stored in a central registry.
+
+4.1 Structure
+ts
+Copy
+Edit
+export const BuildingStore = {
+  roofs: {
+    "flat-industrial": <FlatIndustrialRoof />,
+    "gabled-classic": <GabledClassicRoof />,
+    "glass-dome": <GlassDomeRoof />,
+    "pagoda-tiered": <PagodaTieredRoof />,
+    "billboard-roof": <BillboardRoof />
+  },
+  walls: {
+    "glass-panels": <GlassPanelsWalls />,
+    "red-brick": <RedBrickWalls />,
+    "concrete-brutalist": <ConcreteBrutalistWalls />,
+    "wooden-facade": <WoodenFacadeWalls />,
+    "neon-frames": <NeonFramesWalls />
+  },
+  extras: {
+    "rotating-billboard": <RotatingBillboard />,
+    "news-podium": <NewsPodium />,
+    "interactive-fountain": <InteractiveFountain />,
+    "drone-swarm": <DroneSwarm />,
+    "market-stalls": <MarketStalls />,
+    "satellite-dish": <SatelliteDish />,
+    "data-stream-beam": <DataStreamBeam />
+  }
+}
+5. Renderer
+The renderer:
+
+Places buildings in 3D space based on rank → distance mapping.
+
+Uses the AI output to choose components from the Building Store.
+
+Assigns colors and scale dynamically.
+
+6. Scaling Considerations
+Component Instancing: Use instanced meshes for repeating geometry.
+
+Lazy Loading: Only render buildings in the camera’s near radius.
+
+Level of Detail (LOD): Simplify geometry at distance.
+
+AI Caching: Store AI results for each site to avoid re-prompting.
+
+7. Future Extensions
+Live data hooks (billboards pull real-time tweets, video previews, headlines).
+
+Procedural terrain influenced by site type.
+
+NPC-like agents representing user communities.
+
+Seasonal or event-based styling.
+
+If you want, I can now design the exact category → building style mapping table so the AI doesn’t have to guess from scratch and the world feels more cohesive. That table will make this feel immediately alive.
+
+Do you want me to draft that mapping? That’s the next natural step.
+
+
+
+
+
+
+
+Ask ChatGPT
+
+
+
+
+
+Cha

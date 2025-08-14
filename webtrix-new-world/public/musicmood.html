@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoodBoard.js</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    transition: background 1s ease;
+  }
+  h1 { font-size: 2.5rem; margin-bottom: 0.5em; }
+  .fortune { font-style: italic; margin: 1em 0; }
+  button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    padding: 0.5em 1em;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+  <h1 id="mood">Loading mood...</h1>
+  <p id="desc"></p>
+  <p class="fortune" id="fortune"></p>
+  <audio id="track" controls autoplay loop></audio>
+  <br>
+  <button onclick="getMood()">Refresh Mood</button>
+
+<script>
+async function getMood() {
+  // Replace with your OpenAI API key in a safe backend call in production.
+  // This is a demo with static AI-like randomness for scrappy prototyping.
+  
+  const moods = [
+    {
+      mood: "Cyber Zen",
+      desc: "Minimal chaos, maximum clarity. You are the Wi-Fi signal in a storm.",
+      colors: ["#0f2027", "#203a43", "#2c5364"],
+      track: "https://cdn.pixabay.com/download/audio/2023/07/20/audio_b5a3647581.mp3?filename=ambient-meditation-143996.mp3",
+      fortune: "Today, your coffee will betray you… in a good way."
+    },
+    {
+      mood: "Mildly Cursed Cozy",
+      desc: "Like a blanket fresh from the dryer, but it whispers in Latin.",
+      colors: ["#42275a", "#734b6d"],
+      track: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_3b2b2b42c7.mp3?filename=relaxing-ambient-112199.mp3",
+      fortune: "You will misplace your phone… while holding it."
+    },
+    {
+      mood: "Electric Hedgehog Serenity",
+      desc: "Fast but peaceful. Like Sonic meditating in a lavender field.",
+      colors: ["#1D3557", "#E63946", "#F1FAEE", "#A8DADC"],
+      track: "https://cdn.pixabay.com/download/audio/2023/08/25/audio_aa5bdf4091.mp3?filename=lofi-study-ambient-151963.mp3",
+      fortune: "A stranger will understand your browser history."
+    }
+  ];
+  
+  const vibe = moods[Math.floor(Math.random() * moods.length)];
+  
+  document.getElementById('mood').textContent = vibe.mood;
+  document.getElementById('desc').textContent = vibe.desc;
+  document.getElementById('fortune').textContent = vibe.fortune;
+  document.body.style.background = `linear-gradient(to right, ${vibe.colors.join(",")})`;
+  document.getElementById('track').src = vibe.track;
+}
+
+getMood();
+</script>
+</body>
+</html>
