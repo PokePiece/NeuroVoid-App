@@ -39,6 +39,3 @@ Proprietary system. Not licensed for public redistribution.
 Developed by Dillon Carey  
 https://dilloncarey.com
 
-* * *
-
-Do you want me to make this README leaner and **two-paragraph style** like the Human AGI System one, or keep the modular breakdown for clarity?
